@@ -14,6 +14,7 @@
   "dependencies": {
     "@types/node": "^17.0.25",
     "chalk": "^3.0.0",
+    "detritus-client": "^0.16.3",
     "dotenv": "^16.0.0",
     "node-fetch": "^2.5.0",
     "pariah": "^2.5.5",

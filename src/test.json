@@ -1,0 +1,12 @@
+{
+    "guild_id": "938498570598895676",
+    "modules": {
+        "commands": {
+            "enabled": true,
+            "prefix": "."
+        },
+        "utility": {
+            "enabled": true
+        }
+    }
+}

@@ -18,29 +18,41 @@ var Pylon;
         }
       });
     }
+    async catch(endpoint, params = {}, options = {}) {
+      const data = await this.get.text(endpoint, params, options);
+      switch (data) {
+        case "unauthorized":
+          console.error(chalk.redBright("🔒 Pylon Token Unauthorized on " + endpoint));
+          process.exit(1);
+        case "user not authorized to edit this guild": 
+          console.error(chalk.redBright("🔒 User is not able to edit this guild"));
+          process.exit(1);
+      }
+      try { return JSON.parse(data); } catch (e) { throw data; }
+    }
     async user() {
-      return this.get.json("/user");
+      return this.catch("/user");
     }
     async guildStats(guildId) {
-      return this.get.json("/guilds/:guildId/stats", {
+      return this.catch("/guilds/:guildId/stats", {
         ":guildId": guildId,
       });
     }
     async guild(guildId) {
-      return this.get.json("/guilds/:guildId", {
+      return this.catch("/guilds/:guildId", {
         ":guildId": guildId,
       });
     }
     async deployment(deploymentId) {
-      return this.get.json("/deployments/:deploymentId", {
+      return this.catch("/deployments/:deploymentId", {
         ":deploymentId": deploymentId,
       });
     }
     async guilds() {
-      return this.get.json("/user/guilds");
+      return this.catch("/user/guilds");
     }
     async guildsAvailable() {
-      return this.get.json("/user/guilds/available");
+      return await this.catch("/user/guilds/");
     }
     async publishDeployment(deploymentId, project) {
       return this.post.json(
