@@ -50,7 +50,538 @@ var Colours;
     Colours[Colours["Background"] = 3553599] = "Background";
     Colours[Colours["Embed"] = 3092790] = "Embed";
 })(Colours || (Colours = {}));
+const HtmlColours = {
+    aliceblue: 0xf0f8ff,
+    antiquewhite: 0xfaebd7,
+    aqua: 0x00ffff,
+    aquamarine: 0x7fffd4,
+    azure: 0xf0ffff,
+    beige: 0xf5f5dc,
+    bisque: 0xffe4c4,
+    black: 0x000000,
+    blanchedalmond: 0xffebcd,
+    blue: 0x0000ff,
+    blueviolet: 0x8a2be2,
+    brown: 0xa52a2a,
+    burlywood: 0xdeb887,
+    cadetblue: 0x5f9ea0,
+    chartreuse: 0x7fff00,
+    chocolate: 0xd2691e,
+    coral: 0xff7f50,
+    cornflowerblue: 0x6495ed,
+    cornsilk: 0xfff8dc,
+    crimson: 0xdc143c,
+    cyan: 0x00ffff,
+    darkblue: 0x00008b,
+    darkcyan: 0x008b8b,
+    darkgoldenrod: 0xb8860b,
+    darkgray: 0xa9a9a9,
+    darkgreen: 0x006400,
+    darkkhaki: 0xbdb76b,
+    darkmagenta: 0x8b008b,
+    darkolivegreen: 0x556b2f,
+    darkorange: 0xff8c00,
+    darkorchid: 0x9932cc,
+    darkred: 0x8b0000,
+    darksalmon: 0xe9967a,
+    darkseagreen: 0x8fbc8f,
+    darkslateblue: 0x483d8b,
+    darkslategray: 0x2f4f4f,
+    darkturquoise: 0x00ced1,
+    darkviolet: 0x9400d3,
+    deeppink: 0xff1493,
+    deepskyblue: 0x00bfff,
+    dimgray: 0x696969,
+    dodgerblue: 0x1e90ff,
+    feldspar: 0xd19275,
+    firebrick: 0xb22222,
+    floralwhite: 0xfffaf0,
+    forestgreen: 0x228b22,
+    fuchsia: 0xff00ff,
+    gainsboro: 0xdcdcdc,
+    ghostwhite: 0xf8f8ff,
+    gold: 0xffd700,
+    goldenrod: 0xdaa520,
+    gray: 0x808080,
+    green: 0x008000,
+    greenyellow: 0xadff2f,
+    honeydew: 0xf0fff0,
+    hotpink: 0xff69b4,
+    indianred: 0xcd5c5c,
+    indigo: 0x4b0082,
+    ivory: 0xfffff0,
+    khaki: 0xf0e68c,
+    lavender: 0xe6e6fa,
+    lavenderblush: 0xfff0f5,
+    lawngreen: 0x7cfc00,
+    lemonchiffon: 0xfffacd,
+    lightblue: 0xadd8e6,
+    lightcoral: 0xf08080,
+    lightcyan: 0xe0ffff,
+    lightgoldenrodyellow: 0xfafad2,
+    lightgrey: 0xd3d3d3,
+    lightgreen: 0x90ee90,
+    lightpink: 0xffb6c1,
+    lightsalmon: 0xffa07a,
+    lightseagreen: 0x20b2aa,
+    lightskyblue: 0x87cefa,
+    lightslateblue: 0x8470ff,
+    lightslategray: 0x778899,
+    lightsteelblue: 0xb0c4de,
+    lightyellow: 0xffffe0,
+    lime: 0x00ff00,
+    limegreen: 0x32cd32,
+    linen: 0xfaf0e6,
+    magenta: 0xff00ff,
+    maroon: 0x800000,
+    mediumaquamarine: 0x66cdaa,
+    mediumblue: 0x0000cd,
+    mediumorchid: 0xba55d3,
+    mediumpurple: 0x9370d8,
+    mediumseagreen: 0x3cb371,
+    mediumslateblue: 0x7b68ee,
+    mediumspringgreen: 0x00fa9a,
+    mediumturquoise: 0x48d1cc,
+    mediumvioletred: 0xc71585,
+    midnightblue: 0x191970,
+    mintcream: 0xf5fffa,
+    mistyrose: 0xffe4e1,
+    moccasin: 0xffe4b5,
+    navajowhite: 0xffdead,
+    navy: 0x000080,
+    oldlace: 0xfdf5e6,
+    olive: 0x808000,
+    olivedrab: 0x6b8e23,
+    orange: 0xffa500,
+    orangered: 0xff4500,
+    orchid: 0xda70d6,
+    palegoldenrod: 0xeee8aa,
+    palegreen: 0x98fb98,
+    paleturquoise: 0xafeeee,
+    palevioletred: 0xd87093,
+    papayawhip: 0xffefd5,
+    peachpuff: 0xffdab9,
+    peru: 0xcd853f,
+    pink: 0xffc0cb,
+    plum: 0xdda0dd,
+    powderblue: 0xb0e0e6,
+    purple: 0x800080,
+    red: 0xff0000,
+    rosybrown: 0xbc8f8f,
+    royalblue: 0x4169e1,
+    saddlebrown: 0x8b4513,
+    salmon: 0xfa8072,
+    sandybrown: 0xf4a460,
+    seagreen: 0x2e8b57,
+    seashell: 0xfff5ee,
+    sienna: 0xa0522d,
+    silver: 0xc0c0c0,
+    skyblue: 0x87ceeb,
+    slateblue: 0x6a5acd,
+    slategray: 0x708090,
+    snow: 0xfffafa,
+    springgreen: 0x00ff7f,
+    steelblue: 0x4682b4,
+    tan: 0xd2b48c,
+    teal: 0x008080,
+    thistle: 0xd8bfd8,
+    tomato: 0xff6347,
+    turquoise: 0x40e0d0,
+    violet: 0xee82ee,
+    violetred: 0xd02090,
+    wheat: 0xf5deb3,
+    white: 0xffffff,
+    whitesmoke: 0xf5f5f5,
+    yellow: 0xffff00,
+    yellowgreen: 0x9acd32,
+};
 const invisible = "឵឵";
+const Units = {
+    ms: 1,
+    s: 1000,
+    m: 60 * 1000,
+    h: 60 * 60 * 1000,
+    w: 7 * 60 * 60 * 1000,
+    mo: 30 * 7 * 60 * 60 * 1000,
+    y: 12 * 30 * 7 * 60 * 60 * 1000,
+    d: 10 * 12 * 30 * 7 * 60 * 60 * 1000,
+    c: 10 * 10 * 12 * 30 * 7 * 60 * 60 * 1000,
+    mil: 10 * 10 * 10 * 12 * 30 * 7 * 60 * 60 * 1000,
+};
+
+const UMP = {};
+function inspect(value, { depth = 2, hidden = false } = {}) {
+    if (is.number(value))
+        return `${value}`;
+    if (is.regexp(value))
+        return `${value}`;
+    if (is.bigint(value))
+        return `${value}n`;
+    if (is.nullish(value))
+        return `${value}`;
+    if (is.boolean(value))
+        return `${value}`;
+    if (is.function(value))
+        return `${value}`;
+    if (is.error(value))
+        return `${value.stack}`;
+    if (is.date(value))
+        return value.toISOString();
+    if (is.string(value))
+        return JSON.stringify(value)
+            .replace(/'/g, "\\'")
+            .replace(/\\"/g, '"')
+            .replace(/^"(.*)"$/g, "'$1'");
+    if (is.promise(value))
+        return Promise.race([value, UMP]).then((v) => `Promise { <${v === UMP ? "pending" : "fulfilled"}> }`, () => "Promise { <rejected> }");
+    return oldInspect(value, { depth, hidden });
+}
+const is = {
+    // typeof
+    string: (v) => typeof v === "string",
+    number: (v) => typeof v === "number",
+    bigint: (v) => typeof v === "bigint",
+    boolean: (v) => typeof v === "boolean",
+    function: (v) => typeof v === "function",
+    undefined: (v) => typeof v === "undefined",
+    object: (v) => typeof v === "object" && !is.null(v),
+    // instanceof
+    date: (v) => v instanceof Date,
+    error: (v) => v instanceof Error,
+    regexp: (v) => v instanceof RegExp,
+    promise: (v) => v instanceof Promise,
+    null: (v) => v === null,
+    array: (v) => Array.isArray(v),
+    multi: (m, v) => m.some((k) => is[k](v)),
+    digit: (v) => is.number(v) || is.bigint(v),
+    nullish: (v) => is.null(v) || is.undefined(v),
+};
+function oldInspect(obj, { depth = 2, hidden = false } = {}) {
+    const ctx = {
+        depth,
+        hidden,
+        seen: [],
+        stylize: (v) => v,
+        showHidden: hidden,
+    };
+    return formatValue(ctx, obj, ctx.depth);
+}
+function hasOwn(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+function arrayToHash(array) {
+    var hash = {};
+    array.forEach(function (val, idx) {
+        hash[val] = true;
+    });
+    return hash;
+}
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+    var output = [];
+    for (var i = 0, l = value.length; i < l; ++i) {
+        if (hasOwn(value, String(i))) {
+            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, String(i), true));
+        }
+        else {
+            output.push("");
+        }
+    }
+    keys.forEach(function (key) {
+        if (!key.match(/^\d+$/)) {
+            output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, key, true));
+        }
+    });
+    return output;
+}
+function formatError(value) {
+    return "[" + Error.prototype.toString.call(value) + "]";
+}
+function formatValue(ctx, value, recurseTimes) {
+    if (is.multi(["digit", "string", "boolean", "nullish"], value))
+        return inspect(value);
+    // Look up the keys of the object.
+    var keys = Object.keys(value);
+    var visibleKeys = arrayToHash(keys);
+    try {
+        if (ctx.showHidden && Object.getOwnPropertyNames) {
+            keys = Object.getOwnPropertyNames(value);
+        }
+    }
+    catch (e) {
+        // ignore
+    }
+    // IE doesn't make error fields non-enumerable
+    // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+    if (is.error(value) &&
+        (keys.indexOf("message") >= 0 || keys.indexOf("description") >= 0)) {
+        return formatError(value);
+    }
+    // Some type of object without properties can be shortcutted.
+    if (keys.length === 0) {
+        if (is.function(value)) {
+            var name = value.name ? ": " + value.name : "";
+            return ctx.stylize("[Function" + name + "]", "special");
+        }
+        if (is.regexp(value)) {
+            return ctx.stylize(RegExp.prototype.toString.call(value), "regexp");
+        }
+        if (is.date(value)) {
+            return ctx.stylize(Date.prototype.toString.call(value), "date");
+        }
+        if (is.error(value)) {
+            return formatError(value);
+        }
+    }
+    var base = "", array = false, braces = ["{", "}"];
+    // Make Array say that they are Array
+    if (Array.isArray(value)) {
+        array = true;
+        braces = ["[", "]"];
+    }
+    // Make functions say that they are functions
+    if (is.function(value)) {
+        var n = value.name ? ": " + value.name : "";
+        base = " [Function" + n + "]";
+    }
+    // Make RegExps say that they are RegExps
+    if (is.regexp(value)) {
+        base = " " + RegExp.prototype.toString.call(value);
+    }
+    // Make dates with properties first say the date
+    if (is.date(value)) {
+        base = " " + Date.prototype.toUTCString.call(value);
+    }
+    // Make error with message first say the error
+    if (is.error(value)) {
+        base = " " + formatError(value);
+    }
+    if (keys.length === 0 && (!array || value.length == 0)) {
+        return braces[0] + base + braces[1];
+    }
+    if (recurseTimes < 0) {
+        if (is.regexp(value)) {
+            return ctx.stylize(RegExp.prototype.toString.call(value), "regexp");
+        }
+        else {
+            return ctx.stylize("[Object]", "special");
+        }
+    }
+    ctx.seen.push(value);
+    var output;
+    if (array) {
+        output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+    }
+    else {
+        output = keys.map(function (key) {
+            return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+        });
+    }
+    ctx.seen.pop();
+    return reduceToSingleString(output, base, braces);
+}
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+    var name, str, desc;
+    desc = { value: void 0 };
+    try {
+        // ie6 › navigator.toString
+        // throws Error: Object doesn't support this property or method
+        desc.value = value[key];
+    }
+    catch (e) {
+        // ignore
+    }
+    try {
+        // ie10 › Object.getOwnPropertyDescriptor(window.location, 'hash')
+        // throws TypeError: Object doesn't support this action
+        if (Object.getOwnPropertyDescriptor) {
+            desc = Object.getOwnPropertyDescriptor(value, key) || desc;
+        }
+    }
+    catch (e) {
+        // ignore
+    }
+    if (desc.get) {
+        if (desc.set) {
+            str = ctx.stylize("[Getter/Setter]", "special");
+        }
+        else {
+            str = ctx.stylize("[Getter]", "special");
+        }
+    }
+    else {
+        if (desc.set) {
+            str = ctx.stylize("[Setter]", "special");
+        }
+    }
+    if (!hasOwn(visibleKeys, key)) {
+        name = "[" + key + "]";
+    }
+    if (!str) {
+        if (ctx.seen.indexOf(desc.value) < 0) {
+            if (is.null(recurseTimes)) {
+                str = formatValue(ctx, desc.value, null);
+            }
+            else {
+                str = formatValue(ctx, desc.value, recurseTimes - 1);
+            }
+            if (str.indexOf("\n") > -1) {
+                if (array) {
+                    str = str
+                        .split("\n")
+                        .map(function (line) {
+                        return "  " + line;
+                    })
+                        .join("\n")
+                        .substr(2);
+                }
+                else {
+                    str =
+                        "\n" +
+                            str
+                                .split("\n")
+                                .map(function (line) {
+                                return "   " + line;
+                            })
+                                .join("\n");
+                }
+            }
+        }
+        else {
+            str = ctx.stylize("[Circular]", "special");
+        }
+    }
+    if (is.undefined(name)) {
+        if (array && key.match(/^\d+$/)) {
+            return str;
+        }
+        name = JSON.stringify("" + key);
+        if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+            name = name.substr(1, name.length - 2);
+            name = ctx.stylize(name, "name");
+        }
+        else {
+            name = name
+                .replace(/'/g, "\\'")
+                .replace(/\\"/g, '"')
+                .replace(/(^"|"$)/g, "'");
+            name = ctx.stylize(name, "string");
+        }
+    }
+    return name + ": " + str;
+}
+function reduceToSingleString(output, base, braces) {
+    var length = output.reduce(function (prev, cur) {
+        if (cur.indexOf("\n") >= 0)
+            ;
+        return prev + cur.replace(/\u001b\[\d\d?m/g, "").length + 1;
+    }, 0);
+    if (length > 60) {
+        return (braces[0] +
+            (base === "" ? "" : base + "\n ") +
+            " " +
+            output.join(",\n  ") +
+            " " +
+            braces[1]);
+    }
+    return braces[0] + base + " " + output.join(", ") + " " + braces[1];
+}
+
+class KV {
+    constructor(namespace) {
+        this.kv = new pylon.KVNamespace(namespace);
+    }
+    get namespace() {
+        return this.kv.namespace;
+    }
+    async get(key) {
+        return this.kv.get(key);
+    }
+    async put(key, value, options = {}) {
+        this.kv.put(key, value, options);
+        return this;
+    }
+    async has(key) {
+        return (await this.get(key)) !== undefined;
+    }
+    async cas(key, compare, set, ttl) {
+        return this.kv.cas(key, compare, set, ttl);
+    }
+    async casMulti(operations) {
+        return this.kv.casMulti(operations);
+    }
+    async delete(key, options) {
+        return this.kv.delete(key, options);
+    }
+    async clear() {
+        return this.kv.clear();
+    }
+    async list() {
+        const keys = [];
+        let from = "";
+        while (true) {
+            const page = await this.kv.list({ from, limit: 1000 });
+            keys.push(...page);
+            if (page.length < 1000)
+                break;
+            from = page[page.length - 1];
+        }
+        return keys;
+    }
+    async items() {
+        const items = [];
+        let from = "";
+        while (true) {
+            const page = await this.kv.items({ from, limit: 100 });
+            items.push(...page);
+            if (page.length < 100)
+                break;
+            from = page[page.length - 1].key;
+        }
+        return items;
+    }
+    async read() {
+        const out = {};
+        const items = await this.items();
+        for (const { key, value } of items) {
+            out[key] = value;
+        }
+        return out;
+    }
+    async toJSON() {
+        return this.read();
+    }
+    async write(value) {
+        this.clear();
+        for (const [k, v] of Object.entries(value)) {
+            this.kv.put(k, v);
+        }
+    }
+    async exec(io) {
+        const data = await this.read();
+        this.write(io(data));
+    }
+    async transact(key, io) {
+        return this.kv.transact(key, io);
+    }
+    async transactMulti(keys, io) {
+        return this.kv.transactMulti(keys, io);
+    }
+    async transactWithResult(key, io) {
+        return this.kv.transactWithResult(key, io);
+    }
+    async transactMultiWithResult(keys, io) {
+        return this.kv.transactMultiWithResult(keys, io);
+    }
+    async *[Symbol.asyncIterator]() {
+        for (const { key, value } of await this.items()) {
+            yield [key, value];
+        }
+    }
+    toString() {
+        return `KV(${this.namespace})`;
+    }
+}
+pylon.kv.transactWithResult;
 
 const DefaultOverride = {
     level: 0,
@@ -62,11 +593,83 @@ const DefaultOverride = {
 const DefaultOverrides = {
     "module.commands": { level: 0 },
     "module.utility": { level: 0 },
+    "module.infractions": { level: 50 },
     "command.ping": { level: 0 },
     "command.help": { level: 0 },
     "command.level": { level: 0 },
     "command.nickme": { level: 200 },
+    "command.server": { level: 0 },
+    "command.info": { level: 0 },
+    "command.avatar": { level: 0 },
+    "command.snowflake": { level: 0 },
+    "group.random": { level: 0 },
+    "command.random coin": { level: 0 },
+    "command.random number": { level: 0 },
+    "command.random cat": { level: 0 },
+    "command.random dog": { level: 0 },
+    "command.random fox": { level: 0 },
+    "command.random panda": { level: 0 },
+    "command.random koala": { level: 0 },
+    "command.random birb": { level: 0 },
+    "command.pikachu": { level: 0 },
+    "command.hug": { level: 0 },
+    "command.pat": { level: 0 },
+    "group.remind": { level: 0 },
+    "command.remind clear": { level: 0 },
+    "command.remind add": { level: 0 },
+    "command.remind list": { level: 0 },
+    "group.cur": { level: 0 },
+    "command.cur": { level: 0 },
+    "command.cur name": { level: 0 },
+    "command.cur color": { level: 0 },
+    "command.cur set": { level: 100 },
+    "command.cur clear": { level: 100 },
+    "command.cur delete": { level: 100 },
 };
+
+class Err extends Error {
+    constructor(status, message, showUsage = false) {
+        super(message);
+        this.status = status;
+        this.message = message;
+        this.showUsage = showUsage;
+    }
+    toString() {
+        return fmt("Err({status}): {message}", {
+            message: this.message,
+            status: this.status,
+        });
+    }
+}
+class Ok extends Err {
+    constructor(message) {
+        super(200, message, false);
+        this.message = message;
+    }
+    toString() {
+        return fmt("Ok('{message}')", { message: this.message });
+    }
+}
+class NotImplementedError extends Error {
+    constructor(name) {
+        super(fmt("{name} is not implemented.", { name }));
+        this.name = name;
+    }
+}
+
+async function highestRole(member) {
+    const guild = await member.getGuild();
+    const roles = await guild.getRoles();
+    let role = null;
+    for (const target of roles) {
+        if (member.roles.includes(target.id)) {
+            if (role === null || target.position > role.position) {
+                role = target;
+            }
+        }
+    }
+    return role;
+}
 
 const DefaultResponseOptions = {
     ephemeral: false,
@@ -253,9 +856,99 @@ async function botLevel(config, payload) {
     }
     return Math.max(...levels);
 }
+function parseTimeString(value, units = Units) {
+    const ids = value.match(/\d+\w+/gi);
+    if (ids === null) {
+        throw new Err(400, fmt("Invalid time string '{value}'", { value }));
+    }
+    let i = 0;
+    for (const p of ids) {
+        const m = /(\d+)([a-z]+)/gi.exec(p);
+        if (m === null) {
+            continue;
+        }
+        const [, v, k] = m;
+        if (k.toLowerCase() in units) {
+            const z = Number.parseFloat(v);
+            if (Number.isNaN(z)) {
+                throw new Err(400, fmt("Invalid time increment: '{value}'", { value: v }));
+            }
+            i += units[k] * z;
+            continue;
+        }
+        throw new Err(404, fmt("Unknown time symbol '{symbol}'", { symbol: k }));
+    }
+    return i;
+}
+function deepAssign(target, ...sources) {
+    // iter
+    for (const source of sources) {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (source[key]) {
+                    if (typeof source[key] === "object") {
+                        target[key] = deepAssign(target[key] || {}, source[key]);
+                    }
+                    else {
+                        target[key] = source[key];
+                    }
+                }
+                else {
+                    target[key] = source[key];
+                }
+            }
+        }
+    }
+    return target;
+}
+function parseColor(text) {
+    text = text.toLowerCase().trim().normalize();
+    if (text in HtmlColours) {
+        return HtmlColours[text];
+    }
+    if (!/(?:(?:0x|#)?)[0-9a-f]/gi.test(text)) {
+        throw new Err(400, fmt("Invalid Colour '{text}'", { text }));
+    }
+    if (text.startsWith("#")) {
+        text = text.slice(1);
+    }
+    if (text.startsWith("0x")) {
+        text = text.slice(2);
+    }
+    switch (text.length) {
+        case 3: {
+            const [r, g, b] = text.split("");
+            text = r + r + g + g + b + b;
+            break;
+        }
+        case 6: {
+            break;
+        }
+        default: {
+            throw new Err(400, fmt("Invalid Colour '{text}'", { text }));
+        }
+    }
+    return Number.parseInt(text, 0x10);
+}
+async function canManageRole(role, source) {
+    if (source === undefined) {
+        const id = discord.getBotId();
+        const guild = await discord.getGuild();
+        const me = await guild.getMember(id);
+        if (me === null) {
+            throw new Err(0, "I am not in this guild.");
+        }
+        source = me;
+    }
+    const highest = await highestRole(source);
+    return (source.can(268435456 /* MANAGE_ROLES */) &&
+        highest.position > role.position);
+}
 
 const kv = {
-    config: new pylon.KVNamespace("@internals/config"),
+    config: new KV("@internals/config"),
+    reminders: new KV("@reminders"),
+    cur: new KV("@cur"),
 };
 const encoding = {
     to: new TextEncoder(),
@@ -268,11 +961,33 @@ const DefaultConfig = {
     modules: {
         commands: { enabled: false },
         utility: { enabled: false },
+        infractions: {
+            enabled: true,
+            checkLogs: true,
+            confirmation: {
+                deleteOriginal: false,
+                expiry: 0,
+                message: true,
+                reaction: false,
+            },
+            defaultDeleteDays: 0,
+            integrate: true,
+            muteRole: undefined,
+            targeting: {
+                allowSelf: true,
+                checkLevels: true,
+                checkRoles: true,
+                othersEditLevel: 100,
+                requiredPermissions: true,
+            },
+        },
     },
 };
-const commandList = [];
 let config = DefaultConfig;
 let commands = new discord.command.CommandGroup({});
+const list = {
+    "@global": [],
+};
 async function init() {
     if (config.loaded === true) {
         return;
@@ -280,8 +995,9 @@ async function init() {
     // load config;
     const data = await kv.config.get("data");
     if (data) {
-        config = Object.assign({}, DefaultConfig, data);
+        config = deepAssign({}, DefaultConfig, data);
     }
+    console.log([inspect(config.modules.commands)]);
     config.loaded = true;
     cmd: if (isModuleEnabled(config, "commands")) {
         const allPrefixes = Array.isArray(config.modules.commands?.prefix)
@@ -296,8 +1012,20 @@ async function init() {
             label: "@global",
             mentionPrefix: config.modules.commands?.mention,
         });
-        for (const l of commandList) {
-            commands.on(l.options, l.args, l.handler);
+        // load commands;
+        // load the raw ones before sub commands !
+        for (const [k, v] of Object.entries(list)) {
+            let i = commands;
+            if (k !== "@global") {
+                i = commands.subcommandGroup({ name: k });
+            }
+            for (const c of v) {
+                if (c.options.name === "@default") {
+                    i.default(c.args, c.handler, c.options);
+                    continue;
+                }
+                i.on(c.options, c.args, c.handler);
+            }
         }
     }
 }
@@ -306,17 +1034,13 @@ function validateConfig(config) {
     if (config.guild_id !== discord.getGuildId()) {
         errors.push(new ValidationError("config.guildId", "not in this guild"));
     }
-    if (config.loaded === false) {
-        errors.push(new ValidationError("config.loaded", "config is not yet loaded, send a message to activate"));
-        return errors;
-    }
     if (!("modules" in config) || config.modules === undefined) {
         errors.push(new ValidationError("config.modules", "no modules were defined"));
         return errors;
     }
     for (const key in DefaultConfig.modules) {
         if (!(key in config.modules) || !("enabled" in config.modules[key])) {
-            errors.push(new ValidationError(`config.modules.${key}`, "module was missing, use { enabled: false } to disable a module"));
+            continue;
         }
         // module specific
         const module = config.modules[key];
@@ -331,62 +1055,86 @@ function validateConfig(config) {
     return errors;
 }
 
-class Err extends Error {
-    constructor(status, message) {
-        super(message);
-        this.status = status;
-        this.message = message;
-    }
-    toString() {
-        return fmt("Err({status}): {message}", {
-            message: this.message,
-            status: this.status,
-        });
-    }
-}
-class NotImplementedError extends Error {
-    constructor(name) {
-        super(fmt("{name} is not implemented.", { name }));
-        this.name = name;
-    }
-}
-
-function on(tree, options, args, handler, group = commands) {
+function on(tree, options, args, handler, group = "@global") {
     if (typeof options === "string") {
         options = { name: options };
     }
-    const name = options.name;
+    let name = options.name;
     if (!tree.includes(`command.${name}`)) {
+        if (name === "@default") {
+            name = ``;
+        }
+        if (group !== "@global") {
+            name = `${group} ${name}`.trim();
+        }
         tree.push(`command.${name}`);
     }
-    if ("tree" in group && group["tree"]) {
-        tree = [...group["tree"], ...tree];
-    }
-    group.on({
-        onError(ctx, e) {
-            if (e instanceof Err) {
-                respond.fmt(ctx.message, ":x: `{e}`", { e });
-            }
-            respond.fmt(ctx.message, ":x: Error happened while running command: ```js\n{e}\n```", { e: e.stack });
+    const g = list[group] || [];
+    // throw new Error(name);
+    g.push({
+        tree,
+        options: {
+            onError(ctx, e) {
+                if (e === null) {
+                    return;
+                }
+                if (e instanceof Ok) {
+                    respond.fmt(ctx.message, ":white_check_mark: {message}", {
+                        message: e.message,
+                    });
+                    return;
+                }
+                if (e instanceof discord.command.ArgumentError || e instanceof Err) {
+                    const command = ctx.command;
+                    let i = [name];
+                    for (const [k, v] of command.argumentConfigList) {
+                        let q = v.type.endsWith("Optional") ? "?" : "";
+                        i.push(`${q}<${k}: ${v.type.replace("Optional", "")}>`);
+                    }
+                    respond.fmt(ctx.message, e instanceof Err && !e.showUsage
+                        ? ":warning: {message}"
+                        : ":warning: `{message}`\n```lua\n{usage}\n```", {
+                        message: e.message,
+                        usage: i.join(" "),
+                    });
+                    return;
+                }
+                respond.fmt(ctx.message, ":x: Error happened while running command: ```js\n{e}\n```", { e: e.stack });
+            },
+            ...options,
         },
-        ...options,
-    }, args, async (payload, args, ctx) => {
-        const value = await canRunCommand(config, tree, payload);
-        if (typeof value === "string") {
-            return await respond(payload, {
-                content: value,
-            });
-        }
-        return await handler(payload, args, ctx);
+        args,
+        async handler(payload, args, ctx) {
+            const value = await canRunCommand(config, tree, payload);
+            if (typeof value === "string") {
+                return await respond(payload, {
+                    content: value,
+                });
+            }
+            return await handler(payload, args, ctx);
+        },
     });
+    list[group] = g;
 }
-function raw(tree, options, handler, group = commands) {
-    return on(tree, options, (args) => ({ text: args.textOptional() }), handler);
+function raw(tree, options, handler, group = "@global") {
+    return on(tree, options, (args) => ({ text: args.textOptional() }), handler, group);
 }
-function sub(tree, options, group = commands) {
-    const p = group.subcommandGroup(options);
-    p["tree"] = tree;
-    return p;
+function sub(parentTree, name) {
+    const f = (tree, options, args, handler) => {
+        return on([...parentTree, ...tree], options, args, handler, name);
+    };
+    return {
+        raw(tree, options, handler) {
+            return f(tree, options, (args) => ({ text: args.textOptional() }), handler);
+        },
+        on: f,
+        default: (tree, args, handler, options) => {
+            return f(tree, Object.assign(options || {}, { name: "@default" }), args, handler);
+        },
+        defaultRaw: (tree, handler, options) => {
+            return f(tree, Object.assign(options || {}, { name: "@default" }), (args) => ({ text: args.textOptional() }), handler);
+        },
+    };
 }
 
 var Embed;
@@ -1053,7 +1801,6 @@ on(["module.commands"], "nickme", (args) => ({ text: args.textOptional() }), asy
         throw new Err(500, e);
     }
 });
-sub(["module.utility", "group.random"], "random");
 
 // these always need to be available
 const configContainer = new discord.command.CommandGroup({
@@ -1114,7 +1861,6 @@ configContainer.on("config", (args) => ({ flag: args.stringOptional() }), async 
         return await respond.fmt(payload, "unknown error while parsing your config");
     }
     const checks = validateConfig(json);
-    json["loaded"] = undefined;
     if (checks.length) {
         return await respond.fmt(payload, "your config contains errors:\n{errors}", {
             errors: checks.map((x) => `[${x.label}]: \`${x.reason}\``).join("\n"),
@@ -1158,9 +1904,188 @@ on(["module.utility"], "avatar", (args) => ({ member: args.textOptional() }), as
     });
     return await respond(payload, { embeds: [embed] });
 });
+const random = sub(["module.utility", "group.random"], "random");
+random.raw([], "coin", async (payload) => {
+    const value = Math.random() > 0.5 ? "Heads" : "Tails";
+    return await respond.fmt(payload, ":coin: It landed on **{value}**", {
+        value,
+    });
+});
+random.on([], "number", (args) => ({
+    min: args.integer(),
+    max: args.integerOptional(),
+}), async (payload, args) => {
+    if (args.max === null) {
+        args.max = args.min;
+        args.min = 0;
+    }
+    if (args.min >= args.max) {
+        throw new Err(400, "Minimum cannot be higher than maximum");
+    }
+    const value = Math.floor(Math.random() * (args.max - args.min + 1) + args.min);
+    return await respond.fmt(payload, "It came out to a **{value}**", {
+        value,
+    });
+});
+function createImageCommand(options, path, group) {
+    return (group ? group.raw : raw)([], options, async (payload) => {
+        const embed = Embed.user(payload);
+        const req = await fetch(fmt("https://some-random-api.ml{path}", { path }));
+        const { link } = await req.json();
+        embed.setUrl(link);
+        return await respond(payload, { embeds: [embed] });
+    });
+}
+createImageCommand("cat", "/img/cat", random);
+createImageCommand("dog", "/img/dog", random);
+createImageCommand("fox", "/img/fox", random);
+createImageCommand("panda", "/img/panda", random);
+createImageCommand("koala", "/img/koala", random);
+createImageCommand({ name: "birb", aliases: ["bird"] }, "/img/birb", random);
+createImageCommand("pikachu", "/img/pikachu");
+createImageCommand("hug", "/animu/hug");
+createImageCommand("pat", "/animu/pat");
+const remind = sub(["module.utility", "group.remind"], "remind");
+remind.raw([], "clear", async (payload) => {
+    const id = await kv.reminders.get(payload.author.id);
+    if (id === undefined || id.length === 0) {
+        throw new Err(404, "You have no reminders");
+    }
+    await kv.reminders.delete(payload.author.id);
+    return await respond.fmt(payload, "Ok! Deleted {count} reminders", {
+        count: id.length,
+    });
+});
+remind.on([], "add", (args) => ({
+    time: args.string(),
+    content: args.textOptional(),
+}), async (payload, args) => {
+    const id = (await kv.reminders.get(payload.author.id)) || [];
+    const t = parseTimeString(args.time);
+    if (t < 5 * Units.m || t >= Units.y) {
+        throw new Err(400, "Time must be between 5 minutes and 1 year");
+    }
+    const expiry = Date.now() + t;
+    id.push({
+        content: args.content,
+        expiry,
+        location: `${payload.channelId}/${payload.id}`,
+    });
+    await kv.reminders.put(payload.author.id, id);
+    return await respond.fmt(payload, "Ok! Set reminder for {f} ({r})", {
+        f: Markdown.Format.timestamp(expiry, Markdown.TimestampStyles.BOTH_SHORT),
+        r: Markdown.Format.timestamp(expiry, Markdown.TimestampStyles.RELATIVE),
+    });
+});
+remind.raw([], "list", async (payload) => {
+    const id = await kv.reminders.get(payload.author.id);
+    if (id === undefined || id.length === 0) {
+        throw new Err(404, "You have no reminders.");
+    }
+    const text = id
+        .map((reminder) => fmt(`{f} ({r}): \`{content}\``, {
+        content: reminder.content || "No content",
+        f: Markdown.Format.timestamp(reminder.expiry, Markdown.TimestampStyles.BOTH_SHORT),
+        r: Markdown.Format.timestamp(reminder.expiry, Markdown.TimestampStyles.RELATIVE),
+    }))
+        .join("\n");
+    return respond(payload, text);
+});
+const cur = sub([
+    "module.utility",
+    "group.cur",
+    "criteria.utilities.custom_user_roles.enabled",
+], "cur");
+cur.defaultRaw([], async (payload) => {
+    const id = await kv.cur.get(payload.member.user.id);
+    if (id === undefined) {
+        throw new Err(404, "You have do not have a custom role.");
+    }
+    return await respond.fmt(payload, "Your custom role is <@&{id}>", { id });
+});
+cur.on([], "name", (args) => ({ name: args.text() }), async (payload, args) => {
+    const id = await kv.cur.get(payload.member.user.id);
+    if (id === undefined) {
+        throw new Err(404, "You have do not have a custom role");
+    }
+    const guild = await payload.getGuild();
+    const role = await guild.getRole(id);
+    if (role === null) {
+        await kv.cur.delete(payload.member.user.id); // delete it to save space
+        throw new Err(404, "Your custom role has been deleted");
+    }
+    if (args.name.length > 32) {
+        throw new Err(400, "Text cannot be longer than 32 characters");
+    }
+    const available = await canManageRole(role);
+    if (available === false) {
+        throw new Err(403, "I cannot manage your custom role");
+    }
+    await role.edit({ name: args.name });
+    throw new Ok(fmt("Set your custom role's name to {name}", { name: args.name }));
+});
+cur.on([], "color", (args) => ({ color: args.string() }), async (payload, args) => {
+    const id = await kv.cur.get(payload.member.user.id);
+    if (id === undefined) {
+        throw new Err(404, "You have do not have a custom role");
+    }
+    const guild = await payload.getGuild();
+    const role = await guild.getRole(id);
+    if (role === null) {
+        await kv.cur.delete(payload.member.user.id); // delete it to save space
+        throw new Err(404, "Your custom role has been deleted");
+    }
+    if (args.color.length > 32) {
+        throw new Err(400, "Text cannot be longer than 32 characters");
+    }
+    const available = await canManageRole(role);
+    if (available === false) {
+        throw new Err(403, "I cannot manage your custom role");
+    }
+    const color = parseColor(args.color);
+    await role.edit({ color });
+    throw new Ok(fmt("Set your custom role's name to {name}", { name: args.color }));
+});
 
 const cronEvents = {
     load: { run: init },
+    reminders: {
+        async run() {
+            const guildId = discord.getGuildId();
+            const items = await kv.reminders.items();
+            for (const { key, value } of items) {
+                // clean out empty items just in case
+                if (value.length === 0) {
+                    await kv.reminders.delete(key);
+                    continue;
+                }
+                for (let i = 0; i < value.length; i++) {
+                    const reminder = value[i];
+                    if (reminder.expiry <= Date.now()) {
+                        const [channelId, messageId] = reminder.location.split("/");
+                        const channel = await discord.getGuildTextChannel(channelId);
+                        if (channel === null) {
+                            value.splice(i);
+                            continue;
+                        }
+                        await channel.sendMessage(fmt(`<@{user.id}> \`{content}\`\nhttps://discord.com/channels/{guild.id}/{channel.id}/{message.id}`, {
+                            "guild.id": guildId,
+                            "channel.id": channelId,
+                            "message.id": messageId,
+                            "user.id": key,
+                            content: reminder.content || "...",
+                        }));
+                        value.splice(i);
+                    }
+                }
+                if (value.length === 0) {
+                    kv.reminders.delete(key);
+                    continue;
+                }
+                kv.reminders.put(key, value);
+            }
+        },
+    },
 };
 function cron() {
     pylon.tasks.cron("intervals-5", "0 0/5 * * * * *", async () => {

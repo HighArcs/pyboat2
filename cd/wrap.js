@@ -28,7 +28,7 @@ var Pylon;
           console.error(chalk.redBright("🔒 User is not able to edit this guild"));
           process.exit(1);
       }
-      try { return JSON.parse(data); } catch (e) { throw data; }
+      try { return JSON.parse(data); } catch (e) { if (typeof e === 'string' && e.includes('Internal Server Error')) {  return this.catch(endpoint, params, options) } throw e}
     }
     async user() {
       return this.catch("/user");

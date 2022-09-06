@@ -1,6 +1,6 @@
 import { invisible } from "../constants";
 import { config } from "../globals";
-import { on, raw, sub } from "../tools/commands";
+import { on, raw } from "../tools/commands";
 import { Embed } from "../tools/embed";
 import { Err } from "../tools/err";
 import { Markdown } from "../tools/markdown";
@@ -87,5 +87,3 @@ on(
     }
   }
 );
-
-const random = sub(["module.utility", "group.random"], "random");

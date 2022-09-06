@@ -1,6 +1,6 @@
-import { commands, config } from "../globals";
-import { OverrideString } from "../types";
-import { Err } from "./err";
+import { config, list } from "../globals";
+import { OverrideString, RawCommand } from "../types";
+import { Err, Ok } from "./err";
 import { canRunCommand, respond } from "./utils";
 
 export function on<T extends discord.command.CommandArgumentsContainer>(
@@ -8,25 +8,65 @@ export function on<T extends discord.command.CommandArgumentsContainer>(
   options: string | discord.command.ICommandOptions,
   args: discord.command.ArgumentsParser<T>,
   handler: discord.command.CommandHandler<discord.command.ResolvedArgs<T>>,
-  group: discord.command.CommandGroup = commands
+  group: string = "@global"
 ) {
   if (typeof options === "string") {
     options = { name: options };
   }
-  const name = options.name;
+  let name = options.name;
   if (!tree.includes(`command.${name}`)) {
+    if (name === "@default") {
+      name = ``;
+    }
+    if (group !== "@global") {
+      name = `${group} ${name}`.trim();
+    }
+
     tree.push(`command.${name}`);
   }
 
-  if ("tree" in group && group["tree" as never]) {
-    tree = [...group["tree" as never], ...tree];
-  }
+  const g = list[group] || [];
 
-  group.on(
-    {
+  // throw new Error(name);
+
+  g.push({
+    tree,
+    options: {
       onError(ctx, e) {
-        if (e instanceof Err) {
-          respond.fmt(ctx.message, ":x: `{e}`", { e });
+        if (e === null) {
+          return;
+        }
+
+        if (e instanceof Ok) {
+          respond.fmt(ctx.message, ":white_check_mark: {message}", {
+            message: e.message,
+          });
+          return;
+        }
+
+        if (e instanceof discord.command.ArgumentError || e instanceof Err) {
+          const command = ctx.command as RawCommand;
+
+          let i = [name];
+
+          for (const [k, v] of command.argumentConfigList) {
+            let q = v.type.endsWith("Optional") ? "?" : "";
+
+            i.push(`${q}<${k}: ${v.type.replace("Optional", "")}>`);
+          }
+
+          respond.fmt(
+            ctx.message,
+            e instanceof Err && !e.showUsage
+              ? ":warning: {message}"
+              : ":warning: `{message}`\n```lua\n{usage}\n```",
+            {
+              message: e.message,
+              usage: i.join(" "),
+            }
+          );
+
+          return;
         }
 
         respond.fmt(
@@ -38,7 +78,7 @@ export function on<T extends discord.command.CommandArgumentsContainer>(
       ...options,
     },
     args,
-    async (payload, args, ctx) => {
+    async handler(payload, args, ctx) {
       const value = await canRunCommand(config, tree, payload);
       if (typeof value === "string") {
         return await respond(payload, {
@@ -47,8 +87,10 @@ export function on<T extends discord.command.CommandArgumentsContainer>(
       }
 
       return await handler(payload, args as never, ctx);
-    }
-  );
+    },
+  });
+
+  list[group] = g;
 }
 
 export function raw(
@@ -57,21 +99,85 @@ export function raw(
   handler: discord.command.CommandHandler<
     discord.command.ResolvedArgs<{ text: string | null }>
   >,
-  group: discord.command.CommandGroup = commands
+  group: string = "@global"
 ) {
-  return on(tree, options, (args) => ({ text: args.textOptional() }), handler);
+  return on(
+    tree,
+    options,
+    (args) => ({ text: args.textOptional() }),
+    handler,
+    group
+  );
 }
 
 export function sub(
-  tree: Array<OverrideString>,
-  options:
-    | string
-    | discord.command.Named<
-        Omit<discord.command.ICommandGroupOptions, "register">
-      >,
-  group: discord.command.CommandGroup = commands
-) {
-  const p = group.subcommandGroup(options);
-  p["tree"] = tree;
-  return p;
+  parentTree: Array<OverrideString>,
+  name: string
+): SubcommandGroup {
+  const f = <T extends discord.command.CommandArgumentsContainer>(
+    tree: Array<OverrideString>,
+    options: string | discord.command.ICommandOptions,
+    args: discord.command.ArgumentsParser<T>,
+    handler: discord.command.CommandHandler<discord.command.ResolvedArgs<T>>
+  ) => {
+    return on([...parentTree, ...tree], options, args, handler, name);
+  };
+
+  return {
+    raw(tree, options, handler) {
+      return f(
+        tree,
+        options,
+        (args) => ({ text: args.textOptional() }),
+        handler
+      );
+    },
+
+    on: f,
+    default: (tree, args, handler, options?) => {
+      return f(
+        tree,
+        Object.assign(options || {}, { name: "@default" }),
+        args,
+        handler
+      );
+    },
+    defaultRaw: (tree, handler, options?) => {
+      return f(
+        tree,
+        Object.assign(options || {}, { name: "@default" }),
+        (args) => ({ text: args.textOptional() }),
+        handler
+      );
+    },
+  };
 }
+
+export type SubcommandGroup = {
+  on: <T extends discord.command.CommandArgumentsContainer>(
+    tree: Array<OverrideString>,
+    options: string | discord.command.ICommandOptions,
+    args: discord.command.ArgumentsParser<T>,
+    handler: discord.command.CommandHandler<discord.command.ResolvedArgs<T>>
+  ) => void;
+  raw: (
+    tree: Array<OverrideString>,
+    options: string | discord.command.ICommandOptions,
+    handler: discord.command.CommandHandler<
+      discord.command.ResolvedArgs<{ text: string | null }>
+    >
+  ) => void;
+  default: <T extends discord.command.CommandArgumentsContainer>(
+    tree: Array<OverrideString>,
+    args: discord.command.ArgumentsParser<T>,
+    handler: discord.command.CommandHandler<discord.command.ResolvedArgs<T>>,
+    options?: discord.command.ICommandOptions
+  ) => void;
+  defaultRaw: (
+    tree: Array<OverrideString>,
+    handler: discord.command.CommandHandler<
+      discord.command.ResolvedArgs<{ text: string | null }>
+    >,
+    options?: discord.command.ICommandOptions
+  ) => void;
+};

@@ -1,14 +1,25 @@
 export const kv = {
-  config: new pylon.KVNamespace("@internals/config"),
+  config: new KV<SingleKey<Config>>("@internals/config"),
+  reminders: new KV<Reminders>("@reminders"),
+  cur: new KV<Record<string, string>>("@cur"),
 };
+
+type SingleKey<T> = { data: T };
 
 export const encoding = {
   to: new TextEncoder(),
   from: new TextDecoder(),
 };
 
-import { forceCast, isModuleEnabled, ValidationError } from "./tools/utils";
-import { Command, Config } from "./types";
+import inspect from "./tools/inspect";
+import { KV } from "./tools/kv";
+import {
+  deepAssign,
+  forceCast,
+  isModuleEnabled,
+  ValidationError,
+} from "./tools/utils";
+import { Command, Config, Reminders } from "./types";
 
 export const DefaultConfig: Config = {
   guild_id: discord.getGuildId(),
@@ -17,16 +28,35 @@ export const DefaultConfig: Config = {
   modules: {
     commands: { enabled: false },
     utility: { enabled: false },
+    infractions: {
+      enabled: true,
+      checkLogs: true,
+      confirmation: {
+        deleteOriginal: false,
+        expiry: 0,
+        message: true,
+        reaction: false,
+      },
+      defaultDeleteDays: 0,
+      integrate: true,
+      muteRole: undefined,
+      targeting: {
+        allowSelf: true,
+        checkLevels: true,
+        checkRoles: true,
+        othersEditLevel: 100,
+        requiredPermissions: true,
+      },
+    },
   },
 };
-
-export const commandList: Array<
-  Command<discord.command.CommandArgumentsContainer>
-> = [];
 
 export let config: Config = DefaultConfig;
 export let commands: discord.command.CommandGroup =
   new discord.command.CommandGroup({});
+export const list: Record<string, Array<Command<any>>> = {
+  "@global": [],
+};
 export async function init() {
   if (config.loaded === true) {
     return;
@@ -35,8 +65,10 @@ export async function init() {
   const data = await kv.config.get<any>("data");
 
   if (data) {
-    config = Object.assign({}, DefaultConfig, data);
+    config = deepAssign({}, DefaultConfig, data);
   }
+
+  console.log([inspect(config.modules.commands)]);
 
   config.loaded = true;
 
@@ -56,8 +88,24 @@ export async function init() {
       mentionPrefix: config.modules.commands?.mention,
     });
 
-    for (const l of commandList) {
-      commands.on(l.options, l.args, l.handler);
+    // load commands;
+
+    // load the raw ones before sub commands !
+
+    for (const [k, v] of Object.entries(list)) {
+      let i = commands;
+      if (k !== "@global") {
+        i = commands.subcommandGroup({ name: k });
+      }
+
+      for (const c of v) {
+        if (c.options.name === "@default") {
+          i.default(c.args, c.handler, c.options);
+          continue;
+        }
+
+        i.on(c.options, c.args, c.handler);
+      }
     }
   }
 }
@@ -66,17 +114,6 @@ export function validateConfig(config: Config) {
   const errors: Array<ValidationError> = [];
   if (config.guild_id !== discord.getGuildId()) {
     errors.push(new ValidationError("config.guildId", "not in this guild"));
-  }
-
-  if (config.loaded === false) {
-    errors.push(
-      new ValidationError(
-        "config.loaded",
-        "config is not yet loaded, send a message to activate"
-      )
-    );
-
-    return errors;
   }
 
   if (!("modules" in config) || config.modules === undefined) {
@@ -88,12 +125,7 @@ export function validateConfig(config: Config) {
 
   for (const key in DefaultConfig.modules) {
     if (!(key in config.modules) || !("enabled" in config.modules[key])) {
-      errors.push(
-        new ValidationError(
-          `config.modules.${key}`,
-          "module was missing, use { enabled: false } to disable a module"
-        )
-      );
+      continue;
     }
 
     // module specific

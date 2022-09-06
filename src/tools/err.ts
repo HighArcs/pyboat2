@@ -1,7 +1,11 @@
 import { fmt } from "./utils";
 
 export class Err extends Error {
-  constructor(public readonly status: number, public readonly message: string) {
+  constructor(
+    public readonly status: number,
+    public readonly message: string,
+    public readonly showUsage: boolean = false
+  ) {
     super(message);
   }
 
@@ -10,6 +14,16 @@ export class Err extends Error {
       message: this.message,
       status: this.status,
     });
+  }
+}
+
+export class Ok extends Err {
+  constructor(public readonly message: string) {
+    super(200, message, false);
+  }
+
+  public toString() {
+    return fmt("Ok('{message}')", { message: this.message });
   }
 }
 

@@ -89,8 +89,6 @@ configContainer.on(
 
     const checks = validateConfig(json);
 
-    json["loaded"] = undefined as never;
-
     if (checks.length) {
       return await respond.fmt(
         payload,
@@ -101,7 +99,7 @@ configContainer.on(
       );
     }
 
-    await kv.config.put(key, json as unknown as pylon.JsonObject);
+    await kv.config.put(key, json as never);
 
     await respond.fmt(payload, "ok! uploaded your config");
 

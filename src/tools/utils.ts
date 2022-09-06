@@ -1,6 +1,14 @@
-import { Ranks } from "../constants";
+import { HtmlColours, Ranks, Units } from "../constants";
 import { DefaultOverride, DefaultOverrides } from "../overrides";
-import { Config, Modules, OverrideString, Placeholders } from "../types";
+import {
+  Config,
+  Modules,
+  OverrideString,
+  Placeholders,
+  UnionToIntersection,
+} from "../types";
+import { Err } from "./err";
+import { highestRole } from "./permissions";
 
 export interface ResponseOptions {
   ephemeral?: boolean;
@@ -291,4 +299,128 @@ export async function botLevel(config: Config, payload: discord.GuildMember) {
   }
 
   return Math.max(...levels);
+}
+
+export function parseTimeString(
+  value: string,
+  units: Record<string, number> = Units
+): number {
+  const ids = value.match(/\d+\w+/gi);
+
+  if (ids === null) {
+    throw new Err(400, fmt("Invalid time string '{value}'", { value }));
+  }
+
+  let i = 0;
+
+  for (const p of ids) {
+    const m = /(\d+)([a-z]+)/gi.exec(p);
+
+    if (m === null) {
+      continue;
+    }
+
+    const [, v, k] = m;
+
+    if (k.toLowerCase() in units) {
+      const z = Number.parseFloat(v);
+
+      if (Number.isNaN(z)) {
+        throw new Err(
+          400,
+          fmt("Invalid time increment: '{value}'", { value: v })
+        );
+      }
+
+      i += units[k] * z;
+      continue;
+    }
+
+    throw new Err(404, fmt("Unknown time symbol '{symbol}'", { symbol: k }));
+  }
+
+  return i;
+}
+export function deepAssign<T, U extends Array<any>>(
+  target: T,
+  ...sources: U
+): T & UnionToIntersection<U[number]>;
+export function deepAssign<U extends Array<any>>(target: any, ...sources: U) {
+  // iter
+  for (const source of sources) {
+    for (const key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (source[key]) {
+          if (typeof source[key] === "object") {
+            target[key] = deepAssign(target[key] || {}, source[key]);
+          } else {
+            target[key] = source[key];
+          }
+        } else {
+          target[key] = source[key];
+        }
+      }
+    }
+  }
+
+  return target;
+}
+
+export function parseColor(text: string): number {
+  text = text.toLowerCase().trim().normalize();
+  if (text in HtmlColours) {
+    return HtmlColours[text];
+  }
+
+  if (!/(?:(?:0x|#)?)[0-9a-f]/gi.test(text)) {
+    throw new Err(400, fmt("Invalid Colour '{text}'", { text }));
+  }
+
+  if (text.startsWith("#")) {
+    text = text.slice(1);
+  }
+
+  if (text.startsWith("0x")) {
+    text = text.slice(2);
+  }
+
+  switch (text.length) {
+    case 3: {
+      const [r, g, b] = text.split("");
+      text = r! + r + g + g + b + b;
+      break;
+    }
+    case 6: {
+      break;
+    }
+    default: {
+      throw new Err(400, fmt("Invalid Colour '{text}'", { text }));
+    }
+  }
+
+  return Number.parseInt(text, 0x10);
+}
+
+export async function canManageRole(
+  role: discord.Role,
+  source?: discord.GuildMember
+) {
+  if (source === undefined) {
+    const id = discord.getBotId();
+    const guild = await discord.getGuild();
+    const me = await guild.getMember(id);
+
+    if (me === null) {
+      throw new Err(0, "I am not in this guild.");
+    }
+
+    source = me;
+  }
+
+  const highest = await highestRole(source);
+
+  return (
+    source.can(discord.Permissions.MANAGE_ROLES) &&
+    highest.position > role.position
+  );
 }

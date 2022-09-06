@@ -8,6 +8,7 @@ export interface Config {
 export interface Modules {
   commands: Module<Commands>;
   utility: Module<Utility>;
+  infractions: Module<Infractions>;
 }
 
 export type Module<T> = { enabled: boolean } & Partial<{
@@ -40,7 +41,47 @@ export interface Override {
   bypassLevel?: number;
 }
 
-export interface Utility {}
+export interface Utility {
+  custom_user_roles?: Module<CustomUserRoles>;
+}
+
+export interface CustomUserRoles {
+  clearOnKick?: boolean;
+  clearOnBan?: boolean;
+  clearOnLeave?: boolean;
+}
+
+export interface Infractions {
+  checkLogs?: boolean;
+  integrate?: boolean;
+  muteRole?: boolean;
+  defaultDeleteDays?: number;
+  targeting?: Targeting;
+  confirmation?: Confirmation;
+}
+
+export interface Targeting {
+  requiredPermissions?: boolean | RequiredPermissions;
+  checkLevels?: boolean;
+  checkRoles?: boolean;
+  allowSelf?: boolean;
+  othersEditLevel?: number;
+}
+
+export interface RequiredPermissions {
+  kick?: boolean;
+  ban?: boolean;
+  roles?: boolean;
+  messages?: boolean;
+  nicknames?: boolean;
+}
+
+export interface Confirmation {
+  reaction?: boolean;
+  message?: boolean;
+  expiry?: number;
+  deleteOriginal?: boolean;
+}
 
 export interface CronEvent {
   interval?: number;
@@ -60,8 +101,30 @@ export type Placeholders<T extends string> = {
 };
 
 export interface Command<T extends discord.command.CommandArgumentsContainer> {
-  options: string | discord.command.ICommandOptions;
+  options: discord.command.ICommandOptions;
   args: discord.command.ArgumentsParser<T>;
   handler: discord.command.CommandHandler<discord.command.ResolvedArgs<T>>;
   tree: Array<OverrideString>;
 }
+
+export interface Reminder extends pylon.JsonObject {
+  content: string | null;
+  expiry: number;
+  location: `${string}/${string}`;
+}
+
+export type DeepRecord<V> = { [i: string]: DeepRecord<V> | V };
+
+export type RawCommand = {
+  options: discord.command.ICommandOptions;
+  argumentConfigList: Array<[string, discord.command.IArgumentConfig<unknown>]>;
+  filter: discord.command.filters.ICommandFilter;
+  aliases: Set<string>;
+};
+export interface Reminders extends Record<discord.Snowflake, Array<Reminder>> {}
+
+export type UnionToIntersection<T> = (
+  T extends any ? (x: T) => any : never
+) extends (x: infer R) => any
+  ? R
+  : never;
