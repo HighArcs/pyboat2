@@ -405,9 +405,9 @@ export async function canManageRole(
   role: discord.Role,
   source?: discord.GuildMember
 ) {
+  const guild = await discord.getGuild();
   if (source === undefined) {
     const id = discord.getBotId();
-    const guild = await discord.getGuild();
     const me = await guild.getMember(id);
 
     if (me === null) {
@@ -415,6 +415,10 @@ export async function canManageRole(
     }
 
     source = me;
+  }
+
+  if (guild.ownerId === source.user.id) {
+    return true;
   }
 
   const highest = await highestRole(source);

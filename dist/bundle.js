@@ -657,13 +657,41 @@ class NotImplementedError extends Error {
     }
 }
 
+async function canTarget(source, target, request = [], bot = false) {
+    const reasons = [];
+    const noun = bot ? "My" : "Your";
+    if (source.user.id === target.user.id &&
+        !config.modules.infractions.targeting?.allowSelf) {
+        reasons.push("You cannot target yourself");
+    }
+    const sl = botLevel(config, source);
+    const tl = botLevel(config, target);
+    if (config.modules.infractions.targeting?.checkLevels && sl < tl) {
+        reasons.push(fmt("{noun} level {sl} does not surpass the target's level of {tl}", {
+            sl,
+            tl,
+            noun,
+        }));
+    }
+    const sr = await highestRole(source);
+    const tr = await highestRole(target);
+    if (config.modules.infractions.targeting?.checkRoles &&
+        sr.position < tr.position) {
+        reasons.push(fmt("{noun} highest role of {sr} does not surpass the target's highest role of {tr}", {
+            sr: sr.toMention(),
+            tr: tr.toMention(),
+            noun,
+        }));
+    }
+    return reasons;
+}
 async function highestRole(member) {
     const guild = await member.getGuild();
     const roles = await guild.getRoles();
-    let role = null;
+    let role = (await guild.getRole(guild.id));
     for (const target of roles) {
         if (member.roles.includes(target.id)) {
-            if (role === null || target.position > role.position) {
+            if (target.position > role.position) {
                 role = target;
             }
         }
@@ -931,14 +959,17 @@ function parseColor(text) {
     return Number.parseInt(text, 0x10);
 }
 async function canManageRole(role, source) {
+    const guild = await discord.getGuild();
     if (source === undefined) {
         const id = discord.getBotId();
-        const guild = await discord.getGuild();
         const me = await guild.getMember(id);
         if (me === null) {
             throw new Err(0, "I am not in this guild.");
         }
         source = me;
+    }
+    if (guild.ownerId === source.user.id) {
+        return true;
     }
     const highest = await highestRole(source);
     return (source.can(268435456 /* MANAGE_ROLES */) &&
@@ -1751,9 +1782,33 @@ var Parameters;
                 }
             }
         }
-        throw new Err(400, "Cannot find any members by that name");
+        throw new Err(404, "Cannot find any members by that name");
     }
     Parameters.member = member;
+    async function role(payload, text) {
+        const guild = await payload.getGuild();
+        if (typeof text !== "string") {
+            return (await guild.getRole(guild.id));
+        }
+        text = text.toLowerCase();
+        const roles = await guild.getRoles();
+        for (const role of roles) {
+            if (text.replace(/\D/g, "") === role.id) {
+                return role;
+            }
+            if (role.name.toLowerCase().includes(text)) {
+                return role;
+            }
+        }
+        throw new Err(404, "Cannot find any roles by that name");
+    }
+    Parameters.role = role;
+    async function self() {
+        const guild = await discord.getGuild();
+        const id = discord.getBotId();
+        return (await guild.getMember(id));
+    }
+    Parameters.self = self;
 })(Parameters || (Parameters = {}));
 
 raw(["module.commands"], "ping", async (payload) => {
@@ -1889,6 +1944,91 @@ devContainer.raw("check", async (payload) => {
     }
 });
 
+var Snowflake;
+(function (Snowflake) {
+    Snowflake.DISCORD_SNOWFLAKE_EPOCH = 1420070400000;
+    Snowflake.DISCORD_TOKEN_EPOCH = 1293840000000;
+    Snowflake.bits = {
+        timestamp: 42n,
+        workerId: 5n,
+        processId: 5n,
+        sequence: 12n,
+    };
+    Snowflake.shift = {
+        timestamp: Snowflake.bits.processId + Snowflake.bits.workerId + Snowflake.bits.sequence,
+        workerId: Snowflake.bits.workerId + Snowflake.bits.sequence,
+        processId: Snowflake.bits.sequence,
+        sequence: 0n,
+    };
+    Snowflake.max = {
+        timestamp: 0x40000000000n,
+        processId: -1n ^ (-1n << Snowflake.bits.processId),
+        sequence: -1n ^ (-1n << Snowflake.bits.sequence),
+        workerId: -1n ^ (-1n << Snowflake.bits.workerId),
+    };
+    const cache = {
+        sequence: 0n,
+    };
+    function generate(options = {}) {
+        options = Object.assign({
+            epoch: Snowflake.DISCORD_SNOWFLAKE_EPOCH,
+            processId: 0,
+            timestamp: Date.now(),
+            workerId: 0,
+        }, options);
+        const epoch = BigInt(options.epoch);
+        const processId = BigInt(options.processId) & Snowflake.max.processId;
+        const timestamp = (BigInt(options.timestamp) - epoch) % Snowflake.max.timestamp;
+        const workerId = BigInt(options.workerId) & Snowflake.max.workerId;
+        let sequence;
+        if (options.sequence === undefined) {
+            sequence = cache.sequence = ++cache.sequence & Snowflake.max.sequence;
+        }
+        else {
+            sequence = BigInt(options.sequence) & Snowflake.max.sequence;
+        }
+        const snowflake = {
+            id: "",
+            processId: Number(processId),
+            sequence: Number(sequence),
+            timestamp: Number(timestamp),
+            workerId: Number(workerId),
+        };
+        snowflake.id = String((timestamp << Snowflake.shift.timestamp) |
+            (workerId << Snowflake.shift.workerId) |
+            (processId << Snowflake.shift.processId) |
+            (sequence << Snowflake.shift.sequence));
+        return snowflake;
+    }
+    Snowflake.generate = generate;
+    function deconstruct(id, options = {}) {
+        options = Object.assign({
+            epoch: Snowflake.DISCORD_SNOWFLAKE_EPOCH,
+        }, options);
+        const epoch = BigInt(options.epoch);
+        const snowflake = BigInt(id);
+        return {
+            id,
+            processId: Number((snowflake & 0x1f000n) >> Snowflake.shift.processId),
+            sequence: Number(snowflake & 0xfffn),
+            timestamp: Number((snowflake >> Snowflake.shift.timestamp) + epoch),
+            workerId: Number((snowflake & 0x3e0000n) >> Snowflake.shift.workerId),
+        };
+    }
+    Snowflake.deconstruct = deconstruct;
+    function timestamp(id, options = {}) {
+        options = Object.assign({
+            epoch: Snowflake.DISCORD_SNOWFLAKE_EPOCH,
+        }, options);
+        const epoch = BigInt(options.epoch);
+        if (id) {
+            return Number((BigInt(id) >> Snowflake.shift.timestamp) + epoch);
+        }
+        return 0;
+    }
+    Snowflake.timestamp = timestamp;
+})(Snowflake || (Snowflake = {}));
+
 raw(["module.utility"], "server", async (payload) => {
     throw new NotImplementedError("utilities.info.guild");
 });
@@ -1901,6 +2041,30 @@ on(["module.utility"], "avatar", (args) => ({ member: args.textOptional() }), as
     embed.setTitle(fmt("Avatar of {user.tag}", { "user.tag": member.user.getTag() }));
     embed.setImage({
         url: member.user.getAvatarUrl(),
+    });
+    return await respond(payload, { embeds: [embed] });
+});
+on(["module.utility"], "snowflake", (args) => ({ snowflake: args.string() }), async (payload, args) => {
+    args.snowflake = args.snowflake.replace(/\D/g, "");
+    if (/\d+/g.test(args.snowflake) === false) {
+        throw new Err(400, "Invalid Snowflake");
+    }
+    const { id, processId, sequence, timestamp, workerId } = Snowflake.deconstruct(args.snowflake);
+    const embed = Embed.user(payload);
+    embed.addField({
+        name: "❯ Information",
+        value: fmt(`**Id**: {id}\n**Process Id**: {processId}\n**Sequence**: {sequence}\n**Worker Id**: {workerId}\n**Timestamp**: {timestamp} ({date})`, {
+            id,
+            processId,
+            sequence,
+            timestamp,
+            workerId,
+            date: Markdown.Format.timestamp(timestamp, Markdown.TimestampStyles.BOTH_SHORT),
+        }),
+    });
+    embed.addField({
+        name: "❯ Points to",
+        value: fmt(`**User**: <@{id}>\n**Channel**: <#{id}>\n**Role**: <@&{id}>\n**Slash Command**: </{id}:{id}>`, { id }),
     });
     return await respond(payload, { embeds: [embed] });
 });
@@ -2044,7 +2208,69 @@ cur.on([], "color", (args) => ({ color: args.string() }), async (payload, args) 
     }
     const color = parseColor(args.color);
     await role.edit({ color });
-    throw new Ok(fmt("Set your custom role's name to {name}", { name: args.color }));
+    throw new Ok(fmt("Set your custom role's color to #{color}", {
+        color: color.toString(16).padStart(6, "0"),
+    }));
+});
+async function managementChecks(payload, member, roleText) {
+    const self = await Parameters.self();
+    const userCanTarget = await canTarget(payload.member, member);
+    if (userCanTarget.length) {
+        throw new Err(403, userCanTarget[0]);
+    }
+    const selfCanTarget = await canTarget(self, member, [], true);
+    if (selfCanTarget.length) {
+        throw new Err(403, selfCanTarget[0]);
+    }
+    const role = await Parameters.role(payload, roleText);
+    const userCanManage = await canManageRole(role, payload.member);
+    if (userCanManage === false) {
+        throw new Err(403, "You cannot manage this role");
+    }
+    const selfCanManage = await canManageRole(role, self);
+    if (selfCanManage === false) {
+        throw new Err(403, "I cannot manage this role");
+    }
+    return role;
+}
+cur.on([], "set", (args) => ({ member: args.guildMember(), role: args.text() }), async (payload, args) => {
+    const role = (await managementChecks(payload, args.member, args.role));
+    const currentId = await kv.cur.get(args.member.user.id);
+    if (currentId) {
+        await args.member.removeRole(currentId);
+    }
+    if (role.id === currentId) {
+        throw new Err(400, "This user already has that role set");
+    }
+    await args.member.addRole(role.id);
+    await kv.cur.put(args.member.user.id, role.id);
+    throw new Ok(fmt("Set <@{userId}>'s custom role to <@&{roleId}>", {
+        userId: args.member.user.id,
+        roleId: role.id,
+    }));
+});
+cur.on([], "clear", (args) => ({ member: args.guildMember() }), async (payload, args) => {
+    const currentId = await kv.cur.get(args.member.user.id);
+    if (currentId === undefined) {
+        throw new Err(404, "User has no custom role");
+    }
+    const role = await managementChecks(payload, args.member, currentId);
+    if (role) {
+        await args.member.removeRole(currentId);
+        await kv.cur.delete(args.member.user.id);
+    }
+    throw new Ok("Cleared their custom role");
+});
+cur.on([], "delete", (args) => ({ member: args.guildMember() }), async (payload, args) => {
+    const currentId = await kv.cur.get(args.member.user.id);
+    if (currentId === undefined) {
+        throw new Err(404, "User has no custom role");
+    }
+    const role = await managementChecks(payload, args.member, currentId);
+    if (role) {
+        await role.delete();
+    }
+    throw new Ok("Deleted their custom role");
 });
 
 const cronEvents = {

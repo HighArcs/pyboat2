@@ -4,7 +4,9 @@ import { on, raw, sub, SubcommandGroup } from "../tools/commands";
 import { Embed } from "../tools/embed";
 import { Err, NotImplementedError, Ok } from "../tools/err";
 import { Markdown } from "../tools/markdown";
+import { canTarget } from "../tools/permissions";
 import { Parameters } from "../tools/search";
+import { Snowflake } from "../tools/snowflake";
 import {
   canManageRole,
   fmt,
@@ -36,6 +38,51 @@ on(
 
     embed.setImage({
       url: member.user.getAvatarUrl(),
+    });
+
+    return await respond(payload, { embeds: [embed] });
+  }
+);
+
+on(
+  ["module.utility"],
+  "snowflake",
+  (args) => ({ snowflake: args.string() }),
+  async (payload, args) => {
+    args.snowflake = args.snowflake.replace(/\D/g, "");
+    if (/\d+/g.test(args.snowflake) === false) {
+      throw new Err(400, "Invalid Snowflake");
+    }
+
+    const { id, processId, sequence, timestamp, workerId } =
+      Snowflake.deconstruct(args.snowflake);
+
+    const embed = Embed.user(payload);
+
+    embed.addField({
+      name: "❯ Information",
+      value: fmt(
+        `**Id**: {id}\n**Process Id**: {processId}\n**Sequence**: {sequence}\n**Worker Id**: {workerId}\n**Timestamp**: {timestamp} ({date})`,
+        {
+          id,
+          processId,
+          sequence,
+          timestamp,
+          workerId,
+          date: Markdown.Format.timestamp(
+            timestamp,
+            Markdown.TimestampStyles.BOTH_SHORT
+          ),
+        }
+      ),
+    });
+
+    embed.addField({
+      name: "❯ Points to",
+      value: fmt(
+        `**User**: <@{id}>\n**Channel**: <#{id}>\n**Role**: <@&{id}>\n**Slash Command**: </{id}:{id}>`,
+        { id }
+      ),
     });
 
     return await respond(payload, { embeds: [embed] });
@@ -273,7 +320,116 @@ cur.on(
     await role.edit({ color });
 
     throw new Ok(
-      fmt("Set your custom role's name to {name}", { name: args.color })
+      fmt("Set your custom role's color to #{color}", {
+        color: color.toString(16).padStart(6, "0"),
+      })
     );
+  }
+);
+
+async function managementChecks(
+  payload: discord.GuildMemberMessage,
+  member: discord.GuildMember,
+  roleText: string
+) {
+  const self = await Parameters.self();
+
+  const userCanTarget = await canTarget(payload.member, member);
+
+  if (userCanTarget.length) {
+    throw new Err(403, userCanTarget[0]!);
+  }
+
+  const selfCanTarget = await canTarget(self, member, [], true);
+
+  if (selfCanTarget.length) {
+    throw new Err(403, selfCanTarget[0]!);
+  }
+
+  const role = await Parameters.role(payload, roleText);
+  const userCanManage = await canManageRole(role, payload.member);
+
+  if (userCanManage === false) {
+    throw new Err(403, "You cannot manage this role");
+  }
+
+  const selfCanManage = await canManageRole(role, self);
+
+  if (selfCanManage === false) {
+    throw new Err(403, "I cannot manage this role");
+  }
+
+  return role;
+}
+
+cur.on(
+  [],
+  "set",
+  (args) => ({ member: args.guildMember(), role: args.text() }),
+  async (payload, args) => {
+    const role = (await managementChecks(payload, args.member, args.role))!;
+
+    const currentId = await kv.cur.get(args.member.user.id);
+
+    if (currentId) {
+      await args.member.removeRole(currentId);
+    }
+
+    if (role.id === currentId) {
+      throw new Err(400, "This user already has that role set");
+    }
+
+    await args.member.addRole(role.id);
+    await kv.cur.put(args.member.user.id, role.id);
+
+    throw new Ok(
+      fmt("Set <@{userId}>'s custom role to <@&{roleId}>", {
+        userId: args.member.user.id,
+        roleId: role.id,
+      })
+    );
+  }
+);
+
+cur.on(
+  [],
+  "clear",
+  (args) => ({ member: args.guildMember() }),
+  async (payload, args) => {
+    const currentId = await kv.cur.get(args.member.user.id);
+
+    if (currentId === undefined) {
+      throw new Err(404, "User has no custom role");
+    }
+
+    const role = await managementChecks(payload, args.member, currentId);
+
+    if (role) {
+      await args.member.removeRole(currentId);
+      await kv.cur.delete(args.member.user.id);
+    }
+
+    throw new Ok("Cleared their custom role");
+  }
+);
+
+cur.on(
+  [],
+  "delete",
+  (args) => ({ member: args.guildMember() }),
+  async (payload, args) => {
+    const currentId = await kv.cur.get(args.member.user.id);
+
+    if (currentId === undefined) {
+      throw new Err(404, "User has no custom role");
+    }
+
+    const role = await managementChecks(payload, args.member, currentId);
+
+    if (role) {
+      await role.delete();
+    }
+
+    throw new Ok("Deleted their custom role");
   }
 );

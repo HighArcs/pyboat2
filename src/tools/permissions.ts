@@ -1,13 +1,15 @@
 import { config } from "../globals";
+import { RequiredPermissions } from "../types";
 import { botLevel, fmt } from "./utils";
 
 export async function canTarget(
-  context: discord.GuildMemberMessage,
-
-  target: discord.GuildMember
+  source: discord.GuildMember,
+  target: discord.GuildMember,
+  request: Array<keyof RequiredPermissions> = [],
+  bot: boolean = false
 ) {
-  const { member: source } = context;
   const reasons: Array<string> = [];
+  const noun = bot ? "My" : "Your";
 
   if (
     source.user.id === target.user.id &&
@@ -21,9 +23,10 @@ export async function canTarget(
 
   if (config.modules.infractions.targeting?.checkLevels && sl < tl) {
     reasons.push(
-      fmt("Your level {sl} does not surpass the target's level of {tl}", {
+      fmt("{noun} level {sl} does not surpass the target's level of {tl}", {
         sl,
         tl,
+        noun,
       })
     );
   }
@@ -37,17 +40,17 @@ export async function canTarget(
   ) {
     reasons.push(
       fmt(
-        "Your highest role of {sr} does not surpass the target's highest role of {tr}",
+        "{noun} highest role of {sr} does not surpass the target's highest role of {tr}",
         {
           sr: sr.toMention(),
           tr: tr.toMention(),
+          noun,
         }
       )
     );
   }
 
-  if (reasons.length) {
-  }
+  return reasons;
 }
 
 export async function highestRole(
@@ -56,11 +59,11 @@ export async function highestRole(
   const guild = await member.getGuild();
   const roles = await guild.getRoles();
 
-  let role: discord.Role = null as never;
+  let role: discord.Role = (await guild.getRole(guild.id))!;
 
   for (const target of roles) {
     if (member.roles.includes(target.id)) {
-      if (role === null || target.position > role.position) {
+      if (target.position > role.position) {
         role = target;
       }
     }
