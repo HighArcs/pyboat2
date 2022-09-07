@@ -54,7 +54,7 @@ export interface CustomUserRoles {
 export interface Infractions {
   checkLogs?: boolean;
   integrate?: boolean;
-  muteRole?: boolean;
+  muteRole?: boolean | null;
   defaultDeleteDays?: number;
   targeting?: Targeting;
   confirmation?: Confirmation;
@@ -128,3 +128,7 @@ export type UnionToIntersection<T> = (
 ) extends (x: infer R) => any
   ? R
   : never;
+
+export type DeepRequired<T> = {
+  [P in keyof T]-?: DeepRequired<T[P]>;
+};

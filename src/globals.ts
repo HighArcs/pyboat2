@@ -11,6 +11,7 @@ export const encoding = {
   from: new TextDecoder(),
 };
 
+import { DefaultOverrides } from "./overrides";
 import inspect from "./tools/inspect";
 import { KV } from "./tools/kv";
 import {
@@ -19,15 +20,29 @@ import {
   isModuleEnabled,
   ValidationError,
 } from "./tools/utils";
-import { Command, Config, Reminders } from "./types";
+import { Command, Config, DeepRequired, Reminders } from "./types";
 
-export const DefaultConfig: Config = {
+export const DefaultConfig: DeepRequired<Config> = {
   guild_id: discord.getGuildId(),
   levels: {},
   loaded: false,
   modules: {
-    commands: { enabled: false },
-    utility: { enabled: false },
+    commands: {
+      enabled: true,
+      level_allow_view_others: 0,
+      mention: true,
+      overrides: DefaultOverrides as never,
+      prefix: ["!"],
+    },
+    utility: {
+      enabled: true,
+      custom_user_roles: {
+        clearOnBan: false,
+        clearOnKick: false,
+        clearOnLeave: false,
+        enabled: true,
+      },
+    },
     infractions: {
       enabled: true,
       checkLogs: true,
@@ -39,7 +54,7 @@ export const DefaultConfig: Config = {
       },
       defaultDeleteDays: 0,
       integrate: true,
-      muteRole: undefined,
+      muteRole: null,
       targeting: {
         allowSelf: true,
         checkLevels: true,

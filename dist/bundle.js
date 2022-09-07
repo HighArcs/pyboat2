@@ -209,6 +209,50 @@ const Units = {
     mil: 10 * 10 * 10 * 12 * 30 * 7 * 60 * 60 * 1000,
 };
 
+const DefaultOverride = {
+    level: 0,
+    bypassLevel: 200,
+    disabled: false,
+    channels_blacklist: [],
+    roles_blacklist: [],
+};
+const DefaultOverrides = {
+    "module.commands": { level: 0 },
+    "module.utility": { level: 0 },
+    "module.infractions": { level: 50 },
+    "command.ping": { level: 0 },
+    "command.help": { level: 0 },
+    "command.level": { level: 0 },
+    "command.nickme": { level: 200 },
+    "command.server": { level: 0 },
+    "command.info": { level: 0 },
+    "command.avatar": { level: 0 },
+    "command.snowflake": { level: 0 },
+    "group.random": { level: 0 },
+    "command.random coin": { level: 0 },
+    "command.random number": { level: 0 },
+    "command.random cat": { level: 0 },
+    "command.random dog": { level: 0 },
+    "command.random fox": { level: 0 },
+    "command.random panda": { level: 0 },
+    "command.random koala": { level: 0 },
+    "command.random birb": { level: 0 },
+    "command.pikachu": { level: 0 },
+    "command.hug": { level: 0 },
+    "command.pat": { level: 0 },
+    "group.remind": { level: 0 },
+    "command.remind clear": { level: 0 },
+    "command.remind add": { level: 0 },
+    "command.remind list": { level: 0 },
+    "group.cur": { level: 0 },
+    "command.cur": { level: 0 },
+    "command.cur name": { level: 0 },
+    "command.cur color": { level: 0 },
+    "command.cur set": { level: 100 },
+    "command.cur clear": { level: 100 },
+    "command.cur delete": { level: 100 },
+};
+
 const UMP = {};
 function inspect(value, { depth = 2, hidden = false } = {}) {
     if (is.number(value))
@@ -485,147 +529,6 @@ function reduceToSingleString(output, base, braces) {
     }
     return braces[0] + base + " " + output.join(", ") + " " + braces[1];
 }
-
-class KV {
-    constructor(namespace) {
-        this.kv = new pylon.KVNamespace(namespace);
-    }
-    get namespace() {
-        return this.kv.namespace;
-    }
-    async get(key) {
-        return this.kv.get(key);
-    }
-    async put(key, value, options = {}) {
-        this.kv.put(key, value, options);
-        return this;
-    }
-    async has(key) {
-        return (await this.get(key)) !== undefined;
-    }
-    async cas(key, compare, set, ttl) {
-        return this.kv.cas(key, compare, set, ttl);
-    }
-    async casMulti(operations) {
-        return this.kv.casMulti(operations);
-    }
-    async delete(key, options) {
-        return this.kv.delete(key, options);
-    }
-    async clear() {
-        return this.kv.clear();
-    }
-    async list() {
-        const keys = [];
-        let from = "";
-        while (true) {
-            const page = await this.kv.list({ from, limit: 1000 });
-            keys.push(...page);
-            if (page.length < 1000)
-                break;
-            from = page[page.length - 1];
-        }
-        return keys;
-    }
-    async items() {
-        const items = [];
-        let from = "";
-        while (true) {
-            const page = await this.kv.items({ from, limit: 100 });
-            items.push(...page);
-            if (page.length < 100)
-                break;
-            from = page[page.length - 1].key;
-        }
-        return items;
-    }
-    async read() {
-        const out = {};
-        const items = await this.items();
-        for (const { key, value } of items) {
-            out[key] = value;
-        }
-        return out;
-    }
-    async toJSON() {
-        return this.read();
-    }
-    async write(value) {
-        this.clear();
-        for (const [k, v] of Object.entries(value)) {
-            this.kv.put(k, v);
-        }
-    }
-    async exec(io) {
-        const data = await this.read();
-        this.write(io(data));
-    }
-    async transact(key, io) {
-        return this.kv.transact(key, io);
-    }
-    async transactMulti(keys, io) {
-        return this.kv.transactMulti(keys, io);
-    }
-    async transactWithResult(key, io) {
-        return this.kv.transactWithResult(key, io);
-    }
-    async transactMultiWithResult(keys, io) {
-        return this.kv.transactMultiWithResult(keys, io);
-    }
-    async *[Symbol.asyncIterator]() {
-        for (const { key, value } of await this.items()) {
-            yield [key, value];
-        }
-    }
-    toString() {
-        return `KV(${this.namespace})`;
-    }
-}
-pylon.kv.transactWithResult;
-
-const DefaultOverride = {
-    level: 0,
-    bypassLevel: 200,
-    disabled: false,
-    channels_blacklist: [],
-    roles_blacklist: [],
-};
-const DefaultOverrides = {
-    "module.commands": { level: 0 },
-    "module.utility": { level: 0 },
-    "module.infractions": { level: 50 },
-    "command.ping": { level: 0 },
-    "command.help": { level: 0 },
-    "command.level": { level: 0 },
-    "command.nickme": { level: 200 },
-    "command.server": { level: 0 },
-    "command.info": { level: 0 },
-    "command.avatar": { level: 0 },
-    "command.snowflake": { level: 0 },
-    "group.random": { level: 0 },
-    "command.random coin": { level: 0 },
-    "command.random number": { level: 0 },
-    "command.random cat": { level: 0 },
-    "command.random dog": { level: 0 },
-    "command.random fox": { level: 0 },
-    "command.random panda": { level: 0 },
-    "command.random koala": { level: 0 },
-    "command.random birb": { level: 0 },
-    "command.pikachu": { level: 0 },
-    "command.hug": { level: 0 },
-    "command.pat": { level: 0 },
-    "group.remind": { level: 0 },
-    "command.remind clear": { level: 0 },
-    "command.remind add": { level: 0 },
-    "command.remind list": { level: 0 },
-    "group.cur": { level: 0 },
-    "command.cur": { level: 0 },
-    "command.cur name": { level: 0 },
-    "command.cur color": { level: 0 },
-    "command.cur set": { level: 100 },
-    "command.cur clear": { level: 100 },
-    "command.cur delete": { level: 100 },
-};
 
 class Err extends Error {
     constructor(status, message, showUsage = false) {
@@ -976,6 +879,130 @@ async function canManageRole(role, source) {
         highest.position > role.position);
 }
 
+class KV {
+    constructor(namespace) {
+        this.namespace = namespace;
+    }
+    get guildId() {
+        return discord.getGuildId();
+    }
+    async read() {
+        const req = await fetch(fmt("https://api.clancy.lol/kv/{guildId}/read", { guildId: this.guildId }));
+        return (await req.json())[this.namespace] || {};
+    }
+    async write(data) {
+        const existing = await this.read();
+        existing[this.namespace] = data;
+        await fetch(fmt("https://api.clancy.lol/kv/{guildId}/write?data={data}", {
+            guildId: this.guildId,
+            data: encodeURIComponent(JSON.stringify(data)),
+        }));
+        return this;
+    }
+    async exec(io) {
+        const data = await this.read();
+        this.write(io(data));
+        return this;
+    }
+    async get(key) {
+        const data = await this.read();
+        return data[key];
+    }
+    async put(key, value, options = {}) {
+        const item = await this.get(key);
+        if (item) {
+            if (item === value) {
+                return this;
+            }
+            if (options.ifNotExists) {
+                throw new Error(`${String(key)} already exists`);
+            }
+        }
+        return await this.exec((data) => {
+            data[key] = value;
+            return data;
+        });
+    }
+    async cas(key, compare, set) {
+        const item = await this.get(key);
+        if (item && item === compare) {
+            throw new Error(`${String(key)} is already ${compare}`);
+        }
+        await this.exec((data) => {
+            data[key] = set;
+            return data;
+        });
+        return this;
+    }
+    async casMulti(operations) {
+        for (const operation of operations) {
+            await this.cas(operation.key, operation.compare, operation.set);
+        }
+        return this;
+    }
+    async delete(key) {
+        return await this.exec((data) => {
+            delete data[key];
+            return data;
+        });
+    }
+    async clear() {
+        const data = this.read();
+        await this.write({});
+        return data;
+    }
+    async has(key) {
+        const data = await this.read();
+        return data.hasOwnProperty(key);
+    }
+    async count() {
+        return (await this.list()).length;
+    }
+    async list() {
+        return Object.keys(await this.read());
+    }
+    async items() {
+        const entries = Object.entries(await this.read());
+        return entries.map(([key, value]) => ({
+            key: key,
+            value: value,
+        }));
+    }
+    async transact(key, io) {
+        const item = await this.get(key);
+        if (item) {
+            let o = io(item);
+            return await this.cas(key, undefined, o);
+        }
+    }
+    async transactMulti(keys, io) {
+        for (const key of keys) {
+            await this.transact(key, io);
+        }
+        return this;
+    }
+    async *keys() {
+        for (const key of await this.list()) {
+            yield key;
+        }
+    }
+    async *values() {
+        for (const item of await this.items()) {
+            yield item.value;
+        }
+    }
+    async *entries() {
+        for (const [key, value] of Object.entries(await this.read())) {
+            yield [key, value];
+        }
+    }
+    async *[Symbol.asyncIterator]() {
+        for await (const [key, value] of this.entries()) {
+            yield [key, value];
+        }
+    }
+}
+
 const kv = {
     config: new KV("@internals/config"),
     reminders: new KV("@reminders"),
@@ -990,8 +1017,22 @@ const DefaultConfig = {
     levels: {},
     loaded: false,
     modules: {
-        commands: { enabled: false },
-        utility: { enabled: false },
+        commands: {
+            enabled: true,
+            level_allow_view_others: 0,
+            mention: true,
+            overrides: DefaultOverrides,
+            prefix: ["!"],
+        },
+        utility: {
+            enabled: true,
+            custom_user_roles: {
+                clearOnBan: false,
+                clearOnKick: false,
+                clearOnLeave: false,
+                enabled: true,
+            },
+        },
         infractions: {
             enabled: true,
             checkLogs: true,
@@ -1003,7 +1044,7 @@ const DefaultConfig = {
             },
             defaultDeleteDays: 0,
             integrate: true,
-            muteRole: undefined,
+            muteRole: null,
             targeting: {
                 allowSelf: true,
                 checkLevels: true,
