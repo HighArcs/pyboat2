@@ -12,7 +12,7 @@ export class KV<T = Struct> {
 
   public async read(): Promise<Partial<T>> {
     const req = await fetch(
-      fmt("https://api.clancy.lol/kv/{guildId}/read", { guildId: this.guildId })
+      fmt("https://api.clancy.lol/kv/r/{guildId}", { guildId: this.guildId })
     );
 
     return (await req.json())[this.namespace] || {};
@@ -23,9 +23,9 @@ export class KV<T = Struct> {
     existing[this.namespace] = data;
 
     await fetch(
-      fmt("https://api.clancy.lol/kv/{guildId}/write?data={data}", {
+      fmt("https://api.clancy.lol/kv/w/{guildId}?data={data}", {
         guildId: this.guildId,
-        data: encodeURIComponent(JSON.stringify(data)),
+        data: encodeURIComponent(JSON.stringify(existing)),
       })
     );
 

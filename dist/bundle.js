@@ -887,15 +887,15 @@ class KV {
         return discord.getGuildId();
     }
     async read() {
-        const req = await fetch(fmt("https://api.clancy.lol/kv/{guildId}/read", { guildId: this.guildId }));
+        const req = await fetch(fmt("https://api.clancy.lol/kv/r/{guildId}", { guildId: this.guildId }));
         return (await req.json())[this.namespace] || {};
     }
     async write(data) {
         const existing = await this.read();
         existing[this.namespace] = data;
-        await fetch(fmt("https://api.clancy.lol/kv/{guildId}/write?data={data}", {
+        await fetch(fmt("https://api.clancy.lol/kv/w/{guildId}?data={data}", {
             guildId: this.guildId,
-            data: encodeURIComponent(JSON.stringify(data)),
+            data: encodeURIComponent(JSON.stringify(existing)),
         }));
         return this;
     }
